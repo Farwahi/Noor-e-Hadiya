@@ -1,0 +1,15 @@
+{
+  "UK": {
+    "provider": "Wise",
+    "accountName": "Ume Farwa Syeda",
+    "sortCode": "23-08-01",
+    "accountNumber": "70301181",
+    "currency": "GBP"
+  },
+  "PK": {
+    "provider": "Easypaisa",
+    "accountName": "Syed Iftikhar Hussain Shah Sherazi",
+    "accountNumber": "00923334363312",
+    "currency": "PKR"
+  }
+}
