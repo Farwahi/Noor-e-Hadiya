@@ -1,7 +1,7 @@
 // src/pages/Sadaqah.tsx
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { Service } from "../types";
+import type { DonationItem } from "../types";
 import { addToCart } from "../cart";
 
 type Currency = "GBP" | "PKR";
@@ -42,16 +42,19 @@ export default function Sadaqah() {
     if (!canProceed) return;
 
     const now = Date.now(); // unique id
-    const donation: Service = {
-      id: `sadaqah-${currency.toLowerCase()}-${activeAmount}-${now}`,
+
+    const donation: DonationItem = {
+      id: `don-sadaqah-${currency.toLowerCase()}-${Math.round(activeAmount)}-${now}`,
       name: "General Sadaqah",
-      countLabel: "Donation",
-      priceGBP: currency === "GBP" ? activeAmount : 0,
-      pricePKR: currency === "PKR" ? Math.round(activeAmount) : 0,
+      priceGBP: currency === "GBP" ? Number(activeAmount) : 0,
+      pricePKR: currency === "PKR" ? Math.round(Number(activeAmount)) : 0,
       category: "Sadaqah",
+      isDonation: true,
+      donationGBP: currency === "GBP" ? Number(activeAmount) : undefined,
+      donationPKR: currency === "PKR" ? Math.round(Number(activeAmount)) : undefined,
     };
 
-    addToCart(donation);
+    addToCart(donation, 1);
     nav("/cart");
   }
 
@@ -82,6 +85,7 @@ export default function Sadaqah() {
                   >
                     £1
                   </button>
+
                   <button
                     className={`sadaqah-chip ${currency === "GBP" && amountGBP === 2 ? "active" : ""}`}
                     onClick={() => chooseGBP(2)}
@@ -89,6 +93,7 @@ export default function Sadaqah() {
                   >
                     £2
                   </button>
+
                   <button
                     className={`sadaqah-chip ${currency === "GBP" && amountGBP === 5 ? "active" : ""}`}
                     onClick={() => chooseGBP(5)}
@@ -110,6 +115,7 @@ export default function Sadaqah() {
                   >
                     PKR 200
                   </button>
+
                   <button
                     className={`sadaqah-chip wide ${currency === "PKR" && amountPKR === 300 ? "active" : ""}`}
                     onClick={() => choosePKR(300)}
@@ -117,6 +123,7 @@ export default function Sadaqah() {
                   >
                     PKR 300
                   </button>
+
                   <button
                     className={`sadaqah-chip wide ${currency === "PKR" && amountPKR === 500 ? "active" : ""}`}
                     onClick={() => choosePKR(500)}
@@ -132,9 +139,7 @@ export default function Sadaqah() {
 
             {/* Custom */}
             <div className="sadaqah-custom">
-              <div className="sadaqah-label">
-                Or enter custom amount ({currency}):
-              </div>
+              <div className="sadaqah-label">Or enter custom amount ({currency}):</div>
               <input
                 className="sadaqah-input"
                 placeholder="Enter amount"

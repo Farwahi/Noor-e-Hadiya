@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getCart, clearCart } from "../cart";
-import type { Service } from "../types";
-import { createCheckoutSession, getPaymentDetails, PaymentDetailsResponse } from "../api";
+import type { CartItem, PaymentDetailsResponse } from "../types";
+import { createCheckoutSession, getPaymentDetails } from "../api";
 
 export default function Checkout() {
-  const [items, setItems] = useState<Service[]>(() => getCart());
+  const [items, setItems] = useState<CartItem[]>(() => getCart());
   const [data, setData] = useState<PaymentDetailsResponse["data"] | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -24,12 +24,19 @@ export default function Checkout() {
   const [manualPayerName, setManualPayerName] = useState("");
   const [manualSenderNumber, setManualSenderNumber] = useState("");
 
-  const totalGBP = useMemo(() => items.reduce((s, it) => s + it.priceGBP, 0), [items]);
-  const totalPKR = useMemo(() => items.reduce((s, it) => s + it.pricePKR, 0), [items]);
+  // ✅ Totals (supports Service + DonationItem)
+  const totalGBP = useMemo(() => {
+    return items.reduce((sum, it: any) => sum + Number(it.priceGBP ?? 0), 0);
+  }, [items]);
+
+  const totalPKR = useMemo(() => {
+    return items.reduce((sum, it: any) => sum + Number(it.pricePKR ?? 0), 0);
+  }, [items]);
 
   const selectedTotalLabel =
-    currency === "GBP" ? `£${totalGBP.toFixed(2)}` : `PKR ${totalPKR.toFixed(0)}`;
+    currency === "GBP" ? `£${totalGBP.toFixed(2)}` : `PKR ${Math.round(totalPKR).toLocaleString()}`;
 
+  // ✅ Description (counts duplicate names)
   const description = useMemo(() => {
     if (items.length === 0) return "Noor-e-Hadiya Order";
     const counts = new Map<string, number>();
@@ -60,9 +67,9 @@ export default function Checkout() {
     const lines = [
       "Assalamu Alaikum, I have placed an order on Noor-e-Hadiya.",
       `Reference: ${referenceId}`,
-      `Selected services: ${description}`,
+      `Selected items: ${description}`,
       `Currency: ${currency}`,
-      `Total: ${currency === "GBP" ? `£${totalGBP.toFixed(2)}` : `PKR ${totalPKR.toFixed(0)}`}`,
+      `Total: ${currency === "GBP" ? `£${totalGBP.toFixed(2)}` : `PKR ${Math.round(totalPKR).toLocaleString()}`}`,
       deceasedName ? `Deceased name: ${deceasedName}` : "",
       notes ? `Notes: ${notes}` : "",
       currency === "PKR" ? `Manual method: ${manualMethod}` : "",
@@ -122,8 +129,10 @@ export default function Checkout() {
     try {
       setPaying(true);
 
-      // add extra info into Stripe description (simple)
-      const extra = [deceasedName ? `Deceased: ${deceasedName}` : "", notes ? `Notes: ${notes}` : ""]
+      const extra = [
+        deceasedName ? `Deceased: ${deceasedName}` : "",
+        notes ? `Notes: ${notes}` : "",
+      ]
         .filter(Boolean)
         .join(" | ");
 
@@ -164,11 +173,11 @@ export default function Checkout() {
 
   if (loading) return <p className="muted" style={{ padding: "18px 16px" }}>Loading…</p>;
 
-  // ✅ Wallet receiver (same object for EasyPaisa/JazzCash/UPaisa)
+  // ✅ Wallet receiver
   const walletName = data?.PK?.accountName || "Noor-e-Hadiya";
   const walletNumber = data?.PK?.accountNumber || "03XX-XXXXXXX";
 
-  // ✅ Bank transfer fields
+  // ✅ Bank transfer fields (optional)
   const bankName = (data as any)?.PK?.bank?.bankName || "";
   const bankTitle = (data as any)?.PK?.bank?.accountTitle || "";
   const bankIban = (data as any)?.PK?.bank?.iban || "";
@@ -179,7 +188,6 @@ export default function Checkout() {
     <div className="container checkout-wrap" style={{ maxWidth: 980 }}>
       <div className="checkout-head">
         <div>
-          {/* ✅ Added className="page-heading" so CSS can make it green */}
           <h1 className="page-heading" style={{ marginBottom: 6 }}>Checkout</h1>
           <p className="muted" style={{ marginTop: 0 }}>
             Select currency, then pay online (GBP) or manually (PKR). WhatsApp confirmation is available for help.
@@ -221,8 +229,8 @@ export default function Checkout() {
                     width: "100%",
                     padding: 10,
                     borderRadius: 12,
-                    border: "1px solid rgba(255,255,255,.12)",
-                    background: "rgba(255,255,255,.06)",
+                    border: "1px solid rgba(15,138,95,.18)",
+                    background: "rgba(15,138,95,.06)",
                     color: "inherit",
                   }}
                 >
@@ -237,28 +245,31 @@ export default function Checkout() {
             </div>
           </div>
 
-          {/* Selected services */}
+          {/* Selected items */}
           <div className="card" style={{ marginBottom: 14 }}>
-            <h3 style={{ marginTop: 0 }}>2) Selected Services</h3>
+            <h3 style={{ marginTop: 0 }}>2) Selected Items</h3>
 
             {items.length === 0 ? (
               <p className="muted">No selected items.</p>
             ) : (
               <>
                 <ul style={{ marginTop: 10 }}>
-                  {items.map((it, idx) => (
-                    <li key={`${it.id}-${idx}`}>
-                      {it.name} ({it.countLabel}) —{" "}
-                      {currency === "GBP"
-                        ? `£${it.priceGBP.toFixed(2)}`
-                        : `PKR ${it.pricePKR.toFixed(0)}`}
+                  {items.map((it: any, idx) => (
+                    <li key={`${it.id ?? it.name}-${idx}`}>
+                      <b>{it.name}</b>{" "}
+                      {it.isDonation ? (
+                        <span className="muted">(Sadaqah)</span>
+                      ) : (
+                        <span className="muted">({it.countLabel})</span>
+                      )}{" "}
+                      — {currency === "GBP" ? `£${Number(it.priceGBP).toFixed(2)}` : `PKR ${Math.round(Number(it.pricePKR)).toLocaleString()}`}
                     </li>
                   ))}
                 </ul>
 
                 <div style={{ marginTop: 10 }}>
                   <b>Total:</b> {selectedTotalLabel}{" "}
-                  {currency === "GBP" && <span className="muted">(PKR {totalPKR.toFixed(0)})</span>}
+                  {currency === "GBP" && <span className="muted">(PKR {Math.round(totalPKR).toLocaleString()})</span>}
                   {currency === "PKR" && <span className="muted">( £{totalGBP.toFixed(2)} )</span>}
                 </div>
               </>
@@ -279,8 +290,8 @@ export default function Checkout() {
                   width: "100%",
                   padding: 10,
                   borderRadius: 12,
-                  border: "1px solid rgba(255,255,255,.12)",
-                  background: "rgba(255,255,255,.06)",
+                  border: "1px solid rgba(15,138,95,.18)",
+                  background: "rgba(15,138,95,.06)",
                   color: "inherit",
                 }}
               />
@@ -296,8 +307,8 @@ export default function Checkout() {
                   width: "100%",
                   padding: 10,
                   borderRadius: 12,
-                  border: "1px solid rgba(255,255,255,.12)",
-                  background: "rgba(255,255,255,.06)",
+                  border: "1px solid rgba(15,138,95,.18)",
+                  background: "rgba(15,138,95,.06)",
                   color: "inherit",
                 }}
               />
@@ -309,7 +320,7 @@ export default function Checkout() {
                 href={whatsappLink}
                 target="_blank"
                 rel="noreferrer"
-                style={{ width: "auto", marginTop: 0, borderRadius: 999, padding: "10px 14px" }}
+                style={{ width: "auto", marginTop: 0 }}
               >
                 WhatsApp us for details
               </a>
@@ -327,11 +338,7 @@ export default function Checkout() {
                 Card / Apple Pay / Google Pay (Apple/Google Pay appears automatically when supported).
               </p>
 
-              <button
-                className="btn btn-primary"
-                onClick={payNowStripe}
-                disabled={paying || totalGBP <= 0}
-              >
+              <button className="btn btn-primary" onClick={payNowStripe} disabled={paying || totalGBP <= 0}>
                 {paying ? "Redirecting..." : `Pay £${totalGBP.toFixed(2)} with Stripe`}
               </button>
             </div>
@@ -342,18 +349,10 @@ export default function Checkout() {
             <div className="card" style={{ marginBottom: 14 }}>
               <h3 style={{ marginTop: 0 }}>4) Manual Payment (PKR)</h3>
               <p className="muted" style={{ marginTop: 6 }}>
-                Pay via EasyPaisa / JazzCash / UPaisa (optional) / Bank Transfer, then confirm on WhatsApp with receipt.
+                Pay via EasyPaisa / JazzCash / UPaisa / Bank Transfer, then confirm on WhatsApp with receipt.
               </p>
 
-              <div
-                style={{
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  borderRadius: 14,
-                  padding: 14,
-                  background: "rgba(255,255,255,0.03)",
-                }}
-              >
-                {/* Reference */}
+              <div style={{ border: "1px solid rgba(15,138,95,.18)", borderRadius: 14, padding: 14 }}>
                 <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                   <div>
                     <b>Reference:</b> <span style={{ letterSpacing: 0.4 }}>{referenceId}</span>
@@ -365,7 +364,6 @@ export default function Checkout() {
 
                 <hr style={{ opacity: 0.15, margin: "14px 0" }} />
 
-                {/* Method selector */}
                 <div className="field">
                   <label className="muted">Choose manual payment method</label>
                   <select
@@ -375,8 +373,8 @@ export default function Checkout() {
                       width: "100%",
                       padding: 10,
                       borderRadius: 12,
-                      border: "1px solid rgba(255,255,255,.12)",
-                      background: "rgba(255,255,255,.06)",
+                      border: "1px solid rgba(15,138,95,.18)",
+                      background: "rgba(15,138,95,.06)",
                       color: "inherit",
                       maxWidth: 520,
                     }}
@@ -388,45 +386,29 @@ export default function Checkout() {
                   </select>
                 </div>
 
-                {/* Amount */}
                 <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginTop: 12 }}>
                   <div>
-                    <b>Send PKR:</b> {totalPKR.toFixed(0)}
+                    <b>Send PKR:</b> {Math.round(totalPKR).toLocaleString()}
                   </div>
-                  <button
-                    className="btn"
-                    type="button"
-                    onClick={() => copyText(String(Math.round(totalPKR)))}
-                    style={{ width: "auto" }}
-                  >
+                  <button className="btn" type="button" onClick={() => copyText(String(Math.round(totalPKR)))} style={{ width: "auto" }}>
                     Copy Amount
                   </button>
                 </div>
 
-                {/* Wallet details OR Bank details */}
                 <div style={{ marginTop: 12 }}>
                   {manualMethod !== "Bank Transfer" ? (
                     <>
-                      <div>
-                        <b>Account Name:</b> {walletName}
-                      </div>
+                      <div><b>Account Name:</b> {walletName}</div>
 
                       <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginTop: 8 }}>
-                        <div>
-                          <b>Account Number:</b> {walletNumber}
-                        </div>
-                        <button
-                          className="btn"
-                          type="button"
-                          onClick={() => copyText(walletNumber)}
-                          style={{ width: "auto" }}
-                        >
+                        <div><b>Account Number:</b> {walletNumber}</div>
+                        <button className="btn" type="button" onClick={() => copyText(walletNumber)} style={{ width: "auto" }}>
                           Copy Number
                         </button>
                       </div>
 
                       <div className="muted" style={{ marginTop: 8 }}>
-                        In payment “message/notes”, write this reference: <b>{referenceId}</b>
+                        In payment message/notes, write this reference: <b>{referenceId}</b>
                       </div>
                     </>
                   ) : (
@@ -435,64 +417,15 @@ export default function Checkout() {
                         Use bank transfer details below and include reference: <b>{referenceId}</b>
                       </div>
 
-                      {bankName && (
-                        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginTop: 10 }}>
-                          <div>
-                            <b>Bank Name:</b> {bankName}
-                          </div>
-                          <button className="btn" type="button" onClick={() => copyText(bankName)} style={{ width: "auto" }}>
-                            Copy
-                          </button>
-                        </div>
-                      )}
-
-                      {bankTitle && (
-                        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginTop: 10 }}>
-                          <div>
-                            <b>Account Title:</b> {bankTitle}
-                          </div>
-                          <button className="btn" type="button" onClick={() => copyText(bankTitle)} style={{ width: "auto" }}>
-                            Copy
-                          </button>
-                        </div>
-                      )}
-
-                      {bankIban && (
-                        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginTop: 10 }}>
-                          <div>
-                            <b>IBAN:</b> {bankIban}
-                          </div>
-                          <button className="btn" type="button" onClick={() => copyText(bankIban)} style={{ width: "auto" }}>
-                            Copy IBAN
-                          </button>
-                        </div>
-                      )}
-
-                      {bankAccount && (
-                        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginTop: 10 }}>
-                          <div>
-                            <b>Account Number:</b> {bankAccount}
-                          </div>
-                          <button className="btn" type="button" onClick={() => copyText(bankAccount)} style={{ width: "auto" }}>
-                            Copy Acc
-                          </button>
-                        </div>
-                      )}
-
-                      {bankSwift && (
-                        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginTop: 10 }}>
-                          <div>
-                            <b>SWIFT:</b> {bankSwift}
-                          </div>
-                          <button className="btn" type="button" onClick={() => copyText(bankSwift)} style={{ width: "auto" }}>
-                            Copy SWIFT
-                          </button>
-                        </div>
-                      )}
+                      {!!bankName && <div style={{ marginTop: 10 }}><b>Bank Name:</b> {bankName}</div>}
+                      {!!bankTitle && <div style={{ marginTop: 10 }}><b>Account Title:</b> {bankTitle}</div>}
+                      {!!bankIban && <div style={{ marginTop: 10 }}><b>IBAN:</b> {bankIban}</div>}
+                      {!!bankAccount && <div style={{ marginTop: 10 }}><b>Account Number:</b> {bankAccount}</div>}
+                      {!!bankSwift && <div style={{ marginTop: 10 }}><b>SWIFT:</b> {bankSwift}</div>}
 
                       {!bankIban && !bankAccount && (
                         <div className="muted" style={{ marginTop: 10 }}>
-                          Bank transfer details are not set yet. Please add PK.bank fields in backend payment-details response.
+                          Bank transfer details are not set yet. Add PK.bank fields in backend payment-details response.
                         </div>
                       )}
                     </>
@@ -501,7 +434,6 @@ export default function Checkout() {
 
                 <hr style={{ opacity: 0.15, margin: "14px 0" }} />
 
-                {/* Manual verification fields */}
                 <div className="field">
                   <label className="muted">Transaction ID (required)</label>
                   <input
@@ -512,8 +444,8 @@ export default function Checkout() {
                       width: "100%",
                       padding: 10,
                       borderRadius: 12,
-                      border: "1px solid rgba(255,255,255,.12)",
-                      background: "rgba(255,255,255,.06)",
+                      border: "1px solid rgba(15,138,95,.18)",
+                      background: "rgba(15,138,95,.06)",
                       color: "inherit",
                     }}
                   />
@@ -535,8 +467,8 @@ export default function Checkout() {
                         width: "100%",
                         padding: 10,
                         borderRadius: 12,
-                        border: "1px solid rgba(255,255,255,.12)",
-                        background: "rgba(255,255,255,.06)",
+                        border: "1px solid rgba(15,138,95,.18)",
+                        background: "rgba(15,138,95,.06)",
                         color: "inherit",
                       }}
                     />
@@ -552,19 +484,15 @@ export default function Checkout() {
                         width: "100%",
                         padding: 10,
                         borderRadius: 12,
-                        border: "1px solid rgba(255,255,255,.12)",
-                        background: "rgba(255,255,255,.06)",
+                        border: "1px solid rgba(15,138,95,.18)",
+                        background: "rgba(15,138,95,.06)",
                         color: "inherit",
                       }}
                     />
                   </div>
                 </div>
 
-                <button
-                  className="btn btn-primary"
-                  onClick={confirmManualPakistan}
-                  disabled={totalPKR <= 0}
-                >
+                <button className="btn btn-primary" onClick={confirmManualPakistan} disabled={totalPKR <= 0}>
                   I have paid (Confirm on WhatsApp)
                 </button>
               </div>
@@ -576,7 +504,7 @@ export default function Checkout() {
           )}
         </div>
 
-        {/* RIGHT (quick summary) */}
+        {/* RIGHT */}
         <aside className="sidebar" style={{ top: 86 }}>
           <h3 style={{ marginTop: 0 }}>Order Summary</h3>
           <div className="muted" style={{ marginTop: 6 }}>
@@ -594,24 +522,14 @@ export default function Checkout() {
             </div>
           </div>
 
-          <div style={{ marginTop: 12, borderTop: "1px solid rgba(255,255,255,.10)", paddingTop: 20 }}>
-            <div className="muted" style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 20 }}>
-               Need help? Use WhatsApp. For PKR manual payments, include your <b>Reference</b> and send receipt screenshot.
-           </div>
+          <div style={{ marginTop: 12, borderTop: "1px solid rgba(15,138,95,.15)", paddingTop: 16 }}>
+            <div className="muted" style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 14 }}>
+              Need help? Use WhatsApp. For PKR manual payments, include your <b>Reference</b> and send receipt screenshot.
+            </div>
 
-            <div>
-              <a
-               className="btn"
-               href={whatsappLink}
-               target="_blank"
-               rel="noreferrer"
-               style={{ marginTop: 4 }}
->
-                WhatsApp Support
-             </a>
-
-           </div>
-
+            <a className="btn" href={whatsappLink} target="_blank" rel="noreferrer">
+              WhatsApp Support
+            </a>
           </div>
         </aside>
       </div>

@@ -1,44 +1,23 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import type { Service } from "../types";
+import type { CartItem } from "../types";
 import { clearCart, getCart, onCartChange } from "../cart";
 
-/**
- * Cart can contain:
- * - normal Service items (priceGBP/pricePKR)
- * - donation items with isDonation flag
- */
-type CartItem = Service & {
-  price?: number;
-  pkr?: number;
-  isDonation?: boolean;
-  count?: string;
-};
-
-function getGBP(item: CartItem): number {
-  const val = Number(item.priceGBP ?? item.price ?? 0);
-  return Number.isFinite(val) ? val : 0;
-}
-
-function getPKR(item: CartItem): number {
-  const val = Number(item.pricePKR ?? item.pkr ?? 0);
-  return Number.isFinite(val) ? val : 0;
-}
-
 export default function CartPage() {
-  const [items, setItems] = useState<CartItem[]>(() => getCart() as CartItem[]);
+  const [items, setItems] = useState<CartItem[]>(() => getCart());
 
   useEffect(() => {
-    const unsub = onCartChange(() => setItems(getCart() as CartItem[]));
+    const unsub = onCartChange(() => setItems(getCart()));
     return unsub;
   }, []);
 
   const totalGBP = useMemo(
-    () => items.reduce((sum, it) => sum + getGBP(it), 0),
+    () => items.reduce((sum, it) => sum + (it.priceGBP || 0), 0),
     [items]
   );
+
   const totalPKR = useMemo(
-    () => items.reduce((sum, it) => sum + getPKR(it), 0),
+    () => items.reduce((sum, it) => sum + (it.pricePKR || 0), 0),
     [items]
   );
 
@@ -49,7 +28,7 @@ export default function CartPage() {
           className="card"
           style={{
             marginTop: 18,
-            maxWidth: 1000,          // 👈 RIGHT & LEFT SPACE CONTROL
+            maxWidth: 1000,
             marginLeft: "auto",
             marginRight: "auto",
             padding: "18px 32px",
@@ -65,7 +44,9 @@ export default function CartPage() {
             }}
           >
             <div>
-              <h1 className="page-heading">Cart</h1>
+              <h1 className="page-heading" style={{ margin: 0 }}>
+                Cart
+              </h1>
               <p className="muted" style={{ margin: "6px 0 0" }}>
                 Review your selected services and proceed to checkout.
               </p>
@@ -73,11 +54,7 @@ export default function CartPage() {
 
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
               {items.length > 0 && (
-                <button
-                  className="btn"
-                  onClick={clearCart}
-                  style={{ width: "auto", marginTop: 0 }}
-                >
+                <button className="btn" onClick={clearCart} style={{ width: "auto", marginTop: 0 }}>
                   Clear Cart
                 </button>
               )}
@@ -97,11 +74,7 @@ export default function CartPage() {
                 Your cart is empty.
               </p>
 
-              <Link
-                to="/services"
-                className="btn btn-primary"
-                style={{ width: "auto" }}
-              >
+              <Link to="/services" className="btn btn-primary" style={{ width: "auto" }}>
                 Go to Services
               </Link>
             </div>
@@ -110,19 +83,23 @@ export default function CartPage() {
               {/* Items */}
               <ul style={{ margin: 0, paddingLeft: 18 }}>
                 {items.map((it, idx) => {
-                  const key = `${it.id || it.name}-${idx}`;
-                  const label =
-                    it.countLabel ?? it.count ?? (it.isDonation ? "Donation" : "");
+                  const isDonation = "isDonation" in it && it.isDonation;
+
+                  const label = isDonation
+                    ? "Donation"
+                    : "countLabel" in it
+                      ? it.countLabel
+                      : "";
 
                   return (
-                    <li key={key} style={{ marginBottom: 8 }}>
+                    <li key={`${it.id}-${idx}`} style={{ marginBottom: 8 }}>
                       <span style={{ fontWeight: 700 }}>{it.name}</span>{" "}
-                      {label && <span className="muted">({label})</span>}
-                      {it.isDonation && (
+                      {label ? <span className="muted">({label})</span> : null}
+                      {isDonation ? (
                         <span className="muted" style={{ marginLeft: 8 }}>
                           • Sadaqah
                         </span>
-                      )}
+                      ) : null}
                     </li>
                   );
                 })}
@@ -141,13 +118,7 @@ export default function CartPage() {
                   <b>£{totalGBP.toFixed(2)}</b>
                 </div>
 
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginTop: 8,
-                  }}
-                >
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
                   <span className="muted">Total (PKR)</span>
                   <b>PKR {Math.round(totalPKR).toLocaleString()}</b>
                 </div>

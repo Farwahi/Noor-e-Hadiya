@@ -1,4 +1,4 @@
-// frontend/src/cart.ts
+// src/cart.ts
 import type { CartItem } from "./types";
 
 const CART_KEY = "noor_e_hadiya_cart";
@@ -33,7 +33,6 @@ export function clearCart() {
   notify();
 }
 
-// ✅ optional helper for pages to listen
 export function onCartChange(handler: () => void) {
   window.addEventListener(CART_EVENT, handler);
   return () => window.removeEventListener(CART_EVENT, handler);
