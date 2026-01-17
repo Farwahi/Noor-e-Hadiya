@@ -1,125 +1,758 @@
-:root {
-  --bg: #0b1020;
-  --card: #121a33;
-  --text: #e9ecf5;
-  --muted: #aab2c9;
-  --border: rgba(255, 255, 255, 0.08);
-  --primary: #5b7cfa;
+/* =========================
+   ROOT THEME (LIGHT ISLAMIC)
+========================= */
+:root{
+  --bg:#ffffff;
+  --card:#f4fff8;
+  --text:#101828;
+  --muted:rgba(16,24,40,.65);
+  --border:rgba(15,138,95,.18);
+
+  --emerald:#0f8a5f;
+  --emerald2:#0b6f4c;
+  --gold:#d6b15c;
+
+  --shadow:0 10px 24px rgba(16,24,40,.08);
 }
 
-* { box-sizing: border-box; }
+*{ box-sizing:border-box; }
+
 body {
+  background-color: #eaf4ef; /* soft light green */
   margin: 0;
-  font-family: system-ui, Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
 }
 
-a { color: inherit; text-decoration: none; }
 
-.app { min-height: 100vh; }
+a{ color:inherit; text-decoration:none; }
 
+/* Make footer sit nicely + bottom space on all pages */
+.app{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  padding-bottom: 18px; /* extra gap from bottom */
+}
+
+/* =========================
+   NAVBAR (ONLY SIZE INCREASE)
+========================= */
+/* =========================
+   NAVBAR – ELEGANT ISLAMIC
+========================= */
 .nav {
   position: sticky;
   top: 0;
-  background: rgba(11, 16, 32, 0.85);
+  z-index: 100;
+  background: linear-gradient(
+    180deg,
+    rgba(245, 255, 250, 0.95),
+    rgba(236, 249, 243, 0.95)
+  );
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(15, 138, 95, 0.18);
 }
+
+/* Container */
 .nav-inner {
-  max-width: 1100px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 14px 16px;
+  padding: 10px 24px;   /* ⬅ was 16px, now tighter */
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-.brand { font-weight: 700; letter-spacing: 0.2px; }
-.nav-links a {
-  margin-left: 14px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-}
-.nav-links a.active {
-  border-color: var(--border);
-  background: rgba(255,255,255,0.06);
-}
 
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 18px 16px 40px;
-}
-
-.hero {
-  padding: 18px 0 8px;
-}
-.hero h1 { margin: 0 0 8px; font-size: 28px; }
-.muted { color: var(--muted); }
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1.7fr 0.9fr;
-  gap: 16px;
-}
-
-.section { margin-top: 18px; }
-.section-head { display: flex; align-items: baseline; justify-content: space-between; }
-.section h2 { margin: 0 0 10px; font-size: 18px; }
-
-.cards {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.card {
-  border: 1px solid var(--border);
-  background: var(--card);
-  border-radius: 16px;
-  padding: 14px;
-}
-.card-top {
+/* Brand group */
+.nav-brand {
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
+  align-items: center;
+  gap: 14px;
 }
-.card-title { margin: 0 0 4px; font-size: 16px; }
-.price { text-align: right; }
 
-.btn {
-  margin-top: 12px;
+/* Logo */
+.nav-logo {
+  height: 80px;              /* PROMINENT */
+  width: auto;
+  object-fit: contain;
+}
+
+/* Brand text */
+.brand {
+  font-size: 24px;
+  font-weight: 900;
+  color: #0b6f4c;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+/* Navigation links */
+.nav-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  padding: 8px 16px;
+  border-radius: 888px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0b6f4c;
+  border: 1px solid rgba(15, 138, 95, 0.25);
+  background: rgba(15, 138, 95, 0.06);
+  transition: all 0.2s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  background: rgba(15, 138, 95, 0.15);
+}
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+  .nav-inner {
+    padding: 14px 16px;
+  }
+
+  .nav-logo {
+    height: 46px;
+  }
+
+  .brand {
+    font-size: 20px;
+  }
+
+  .nav-links {
+    gap: 6px;
+  }
+
+  .nav-links a {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+/* =========================
+   GLOBAL PAGE WIDTH (ALL PAGES SAME)
+========================= */
+.page{
+  width:100%;
+  padding:36px 24px 56px;
+  flex: 1; /* pushes footer to bottom on short pages */
+}
+
+.page-inner,
+.container{
+  width:100%;
+  max-width:1440px;
+  margin:0 auto;
+}
+
+@media (min-width:1800px){
+  .page-inner,
+  .container{ max-width:1600px; }
+}
+
+/* normalize older container padding */
+.container{
+  padding-left:24px;
+  padding-right:24px;
+}
+
+/* =========================
+   GLOBAL BUTTONS (DEFAULT)
+========================= */
+.btn,
+.btn-primary,
+.btn-outline{
+  width:100%;
+  padding:12px 18px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  background:linear-gradient(180deg,#149c6b,#0b6f4c);
+  color:#fff;
+  font-weight:600;
+  font-size:15px;
+  box-shadow:0 6px 14px rgba(11,111,76,.28);
+  transition:.2s;
+}
+
+.btn:hover{ filter:brightness(1.06); }
+.btn:active{ transform:translateY(1px); }
+.btn:disabled{ opacity:.6; box-shadow:none; cursor:not-allowed; }
+
+/* keep header/row buttons auto width */
+.home-actions .btn,
+.services-top-actions .btn{
+  width:auto;
+}
+
+/* =========================
+   CARDS
+========================= */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  box-shadow:var(--shadow);
+}
+
+/* =========================
+   HOME PAGE BACKGROUND (SOFT, NOT WHITE)
+========================= */
+.home-page{
+  min-height: calc(100vh - 70px);
+
+  /* ✅ ADD THIS */
+  /* padding-left: 44px;
+  padding-right: 44px; */
+
+  background:
+    radial-gradient(900px 520px at 18% 0%, rgba(15,138,95,.16), transparent 60%),
+    radial-gradient(850px 520px at 82% 12%, rgba(214,177,92,.12), transparent 55%),
+    radial-gradient(700px 420px at 30% 85%, rgba(15,138,95,.10), transparent 60%),
+    linear-gradient(180deg, #fbfffd 0%, #f2fbf6 45%, #ffffff 100%);
+}
+
+/* HERO */
+.home-hero{
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:20px;
+  align-items:center;
+}
+
+@media(max-width:900px){
+  .home-hero{ grid-template-columns:1fr; }
+}
+
+.home-hero--single{ grid-template-columns:1fr !important; }
+
+.home-hero-bg-photo{
+  position:relative;
+  border-radius:22px;
+  overflow:hidden;
+  padding:44px;
+  border:1px solid rgba(15,138,95,.25);
+  box-shadow:0 18px 38px rgba(11,111,76,.16);
+}
+
+.home-hero-bg-photo::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:url("/home-bg.png");
+  background-size:cover;
+  background-position:center;
+  opacity:1;
+}
+
+.home-hero-bg-photo::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    90deg,
+    rgba(8,56,40,.74),
+    rgba(8,56,40,.30)
+  );
+}
+
+.home-hero-bg-photo > *{
+  position:relative;
+  z-index:2;
+}
+
+.badge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.28);
+  color:#fff;
+}
+
+.home-title{
+  margin:12px 0 8px;
+  font-size:36px;
+  color:#fff;
+}
+
+.home-subtitle{
+  line-height:1.7;
+  color:rgba(255,255,255,.92);
+}
+
+/* HOME Sections */
+.section-card{ margin-top:16px; }
+
+.section-title{
+  margin:0 0 10px;
+  font-size:24px;
+  color:#0b6f4c;
+}
+
+.section-text{
+  margin:0;
+  line-height:1.7;
+  color:rgba(16,24,40,.75);
+}
+
+.section-list{
+  margin:0;
+  padding-left:20px;
+  color:rgba(16,24,40,.75);
+}
+
+.section-list li{ margin:8px 0; }
+
+/* =========================
+   SOCIAL (CENTER BOTTOM)
+========================= */
+.social-wrap{
+  margin:40px auto 0;
+  padding:24px 0 12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+.social-title{
+  font-weight:800;
+  font-size:18px;
+  color:#0b6f4c;
+  margin-bottom:14px;
+}
+
+.social-icons{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+.social-icon{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  background:#fff;
+  border:1px solid rgba(15,138,95,.25);
+  box-shadow:0 6px 14px rgba(11,111,76,.18);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all .2s ease;
+}
+
+.social-icon:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 20px rgba(11,111,76,.28);
+}
+
+.social-icon img{
+  width:22px;
+  height:22px;
+  object-fit:contain;
+}
+
+/* Footer spacing (gap from bottom) */
+.site-footer{
+  margin-top:18px;
+  padding:16px 0 32px; /* bottom space added */
+  border-top:1px solid rgba(15,138,95,.18);
+  color:rgba(16,24,40,.60);
+  font-size:13px;
+  text-align:center;
+}
+
+/* =========================
+   SERVICES PAGE (FINAL)
+========================= */
+
+/* Header row (Services + buttons) */
+.services-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;        /* ✅ same vertical level */
+  flex-wrap:wrap;
+  gap:16px;
+  margin-top: 6px;           /* ✅ less extra space */
+  margin-bottom: 10px;
+}
+
+/* Left side text wrapper */
+.services-left{
+  min-width: 260px;
+}
+
+/* Right side buttons wrapper */
+.services-actions{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+}
+
+/* Title/subtitle */
+.services-title{
+  font-size:42px;
+  color:#0b6f4c;
+  margin: 0;                 /* ✅ remove default h1 margin */
+  line-height: 1.1;
+}
+
+.services-subtitle{
+  max-width:650px;
+  color:rgba(16,24,40,.7);
+  margin: 8px 0 0;           /* ✅ controlled spacing */
+}
+
+/* Small header buttons (ONLY for top actions) */
+.services-actions .btn{
+  width:auto !important;     /* ✅ prevent full width */
+  padding:10px 16px;
+  font-size:14px;
+  margin:0 !important;
+  white-space:nowrap;
+}
+
+/* Sections */
+.services-section{ margin-top:32px; }
+
+.services-section-head{
+  text-align:center;
+  margin-bottom:18px;
+}
+
+.services-section-head h2{
+  font-size:32px;
+  color:#0b6f4c;
+  margin: 0 0 6px;           /* ✅ tidy spacing */
+}
+
+/* Grid */
+.services-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+}
+/* =========================
+   SERVICES SECTION DIVIDER
+========================= */
+.services-divider{
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.06);
-  color: var(--text);
-  border-radius: 12px;
-  cursor: pointer;
+  max-width: 1100px;            /* matches content width */
+  height: 1px;
+  margin: 42px auto 36px;       /* space above & below */
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(15,138,95,.25),
+    transparent
+  );
 }
-.btn:hover { background: rgba(255,255,255,0.10); }
 
-.btn-primary {
-  background: var(--primary);
-  border-color: transparent;
+@media(max-width:1000px){
+  .services-grid{ grid-template-columns:repeat(2,1fr); }
 }
-.btn-primary:hover { filter: brightness(1.05); }
 
-.sidebar {
-  position: sticky;
-  top: 70px;
-  height: fit-content;
-  border: 1px solid var(--border);
+@media(max-width:560px){
+  .services-grid{ grid-template-columns:1fr; }
+  .services-actions{ justify-content:flex-start; } /* nicer on mobile */
+}
+
+
+/* Service cards */
+.services-light .card{
+  background:#f4fff8;
+  box-shadow:none;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  min-height:220px;
+}
+
+.service-card-top{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.service-card-img{
+  width:64px;
+  height:64px;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid var(--border);
+  overflow:hidden;
+  flex:0 0 auto;
+}
+
+.service-card-img img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.service-count{
+  font-size:13px;
+  font-weight:700;
+  color:#0b6f4c;
+}
+
+.service-price-row{
+  margin-top:6px;
+  padding-top:10px;
+  border-top:1px solid var(--border);
+  display:flex;
+  gap:10px;
+}
+
+.service-price-gbp{
+  font-size:22px;
+  font-weight:900;
+  color:#0b6f4c;
+}
+
+/* ✅ Service card Add button (small, centered, no overlap) */
+.services-grid .btn,
+.services-grid .btn-primary,
+.services-grid button{
+  margin-top:auto;          /* push to bottom */
+  width:40%;
+  max-width:180px;
+  padding:7px 14px;
+  font-size:14px;
+  align-self:center;
+  box-shadow:0 6px 12px rgba(11,111,76,.22);
+}
+
+/* =========================
+   RESPONSIVE HELPERS
+========================= */
+@media(max-width:900px){
+  .grid-2{ grid-template-columns:1fr; }
+  .page{ padding:28px 16px 44px; }
+  .container{ padding-left:16px; padding-right:16px; }
+  .nav-inner{ padding-left:16px; padding-right:16px; }
+}
+/* =========================
+   SADAQAH PAGE
+========================= */
+
+/* Center whole section on page */
+.sadaqah-page{
+  display: flex;
+  justify-content: center;
+  padding: 40px 16px 60px;
+}
+
+/* =========================
+   SADAQAH PAGE
+========================= */
+.sadaqah-card{
+  width: min(900px, 100%);
+  margin: 18px auto 0;
   background: var(--card);
-  border-radius: 16px;
-  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: var(--shadow);
 }
 
-.cart-list { margin: 10px 0 0; padding-left: 18px; }
-.totals { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
-
-@media (max-width: 900px) {
-  .grid-2 { grid-template-columns: 1fr; }
-  .sidebar { position: relative; top: 0; }
+.sadaqah-head{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 10px 18px;
 }
+
+.sadaqah-img{
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #fff;
+  object-fit: cover;
+}
+
+.sadaqah-title{
+  font-size: 22px;
+  font-weight: 900;
+  color: #0b6f4c;
+}
+
+.sadaqah-subtitle{
+  margin-top: 4px;
+  color: rgba(16,24,40,.65);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.sadaqah-box{
+  background: #fff;
+  border: 1px solid rgba(15,138,95,.20);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.sadaqah-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+@media (max-width: 720px){
+  .sadaqah-grid{ grid-template-columns: 1fr; }
+}
+
+.sadaqah-col-title{
+  font-weight: 800;
+  color: rgba(16,24,40,.80);
+  margin-bottom: 10px;
+}
+
+.sadaqah-chips{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sadaqah-chip{
+  border: 1px solid rgba(15,138,95,.30);
+  background: rgba(15,138,95,.06);
+  color: #0b6f4c;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: .15s ease;
+}
+
+.sadaqah-chip.wide{
+  min-width: 120px;
+  text-align: center;
+}
+
+.sadaqah-chip:hover{
+  background: rgba(15,138,95,.12);
+}
+
+.sadaqah-chip.active{
+  background: rgba(15,138,95,.18);
+  border-color: rgba(15,138,95,.45);
+}
+
+.sadaqah-divider{
+  height: 1px;
+  background: rgba(15,138,95,.20);
+  margin: 16px 0;
+}
+
+.sadaqah-label{
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: rgba(16,24,40,.75);
+}
+
+.sadaqah-input{
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(15,138,95,.25);
+  padding: 12px 14px;
+  outline: none;
+  font-size: 14px;
+}
+
+.sadaqah-input:focus{
+  border-color: rgba(15,138,95,.55);
+}
+
+.sadaqah-cta{
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.sadaqah-cta-btn{
+  width: min(420px, 100%);
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(180deg,#149c6b,#0b6f4c);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 10px 22px rgba(11,111,76,.22);
+}
+
+.sadaqah-cta-btn:disabled{
+  opacity: .55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.sadaqah-note{
+  text-align: center;
+  margin-top: 12px;
+  color: rgba(16,24,40,.60);
+  font-size: 13px;
+}
+/* =========================
+   PAGE TITLES (ONLY THESE PAGES)
+   About | Cart | Contact | Checkout
+========================= */
+.about-page h1, .about-page h2, .about-page h3,
+.cart-page h1,  .cart-page h2,  .cart-page h3,
+.contact-page h1, .contact-page h2, .contact-page h3,
+.checkout-page h1, .checkout-page h2, .checkout-page h3{
+  color: var(--emerald2);
+}
+/* Force green headings ONLY inside page cards */
+.container .card > h1,
+.container .card > h2,
+.container .card > h3{
+  color: var(--emerald2) !important;
+}
+.page-heading { color: var(--emerald2); }
+/* Checkout section headings ONLY */
+.checkout-wrap h3 {
+  color: var(--emerald2);
+}
+/* Fix Checkout sidebar overlap */
+.checkout-grid{
+  align-items: flex-start;  /* keeps columns aligned nicely */
+}
+
+.sidebar{
+  position: sticky;
+  top: 86px;               /* same as your inline style */
+  align-self: flex-start;  /* important */
+  height: fit-content;     /* prevents stretching */
+  margin-bottom: 24px;     /* stops overlap into footer area */
+  z-index: 2;
+}
+
+/* Ensure main checkout area has bottom space */
+.checkout-wrap{
+  padding-bottom: 60px;
+}
+/* =========================
+   HOME PAGE – FIXED LEFT / RIGHT SPACE
+========================= */
+.home-page .container,
+.home-page .page-inner{
+  padding-left: 44px !important;
+  padding-right: 44px !important;
+}
+

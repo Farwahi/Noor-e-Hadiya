@@ -5,34 +5,28 @@ export default function Navbar() {
   return (
     <header className="nav">
       <div className="nav-inner">
-        <Link to="/" className="brand">
-          Noor e Hadiya
-        </Link>
+        {/* Brand + Logo */}
+        <div className="nav-brand">
+          <img
+            src="/logo.png"
+            alt="Noor e Hadiya"
+            className="nav-logo"
+          />
 
-        <nav className="nav-links">
-           <NavLink to="/" className={({ isActive }) => (isActive ? "active" : "")}>
-            Home
-          </NavLink>
-          <NavLink to="/" className={({ isActive }) => (isActive ? "active" : "")}>
-            Services
-          </NavLink>
-           <NavLink to="/" className={({ isActive }) => (isActive ? "active" : "")}>
-            Sadaqah
-          </NavLink>
-           <NavLink to="/" className={({ isActive }) => (isActive ? "active" : "")}>
-            About
-          </NavLink>
-           <NavLink to="/" className={({ isActive }) => (isActive ? "active" : "")}>
-            Contact
-          </NavLink>
-          <NavLink to="/" className={({ isActive }) => (isActive ? "active" : "")}>
-            Cart
-          </NavLink>
-          <NavLink
-            to="/checkout"
-            className={({ isActive }) => (isActive ? "active" : "")}>
-            Checkout
-          </NavLink>
+          <Link to="/" className="brand">
+            Noor e Hadiya
+          </Link>
+        </div>
+
+        {/* Navigation */}
+        <nav className="nav-links" aria-label="Main navigation">
+          <NavLink to="/" end>Home</NavLink>
+          <NavLink to="/services">Services</NavLink>
+          <NavLink to="/sadaqah">Sadaqah</NavLink>
+          <NavLink to="/about">About</NavLink>
+          <NavLink to="/contact">Contact</NavLink>
+          <NavLink to="/cart">Cart</NavLink>
+          <NavLink to="/checkout">Checkout</NavLink>
         </nav>
       </div>
     </header>

@@ -1,119 +1,62 @@
-import React, { useEffect, useMemo, useState } from "react";
-import ServiceCard from "../components/ServiceCard";
-import { Service } from "../types";
-import { addToCart as saveToCart, getCart, clearCart, onCartChange } from "../cart";
-
-const SERVICES: Service[] = [
-  { id: "s1", name: "Salawat", countLabel: "100x", priceGBP: 2, pricePKR: 600, category: "Tasbeeh" },
-  { id: "s2", name: "Istighfar", countLabel: "100x", priceGBP: 2, pricePKR: 600, category: "Tasbeeh" },
-  { id: "s3", name: "Ayat-e-Karimah", countLabel: "100x", priceGBP: 2, pricePKR: 600, category: "Tasbeeh" },
-  { id: "s4", name: "Tasbih-e-Fatimah", countLabel: "1x", priceGBP: 2, pricePKR: 600, category: "Tasbeeh" },
-
-  { id: "s5", name: "Surah Yasin", countLabel: "1x", priceGBP: 3, pricePKR: 900, category: "Quran" },
-  { id: "s6", name: "Surah Ikhlas", countLabel: "41x", priceGBP: 3, pricePKR: 900, category: "Quran" },
-  { id: "s7", name: "Short Surahs", countLabel: "3x", priceGBP: 4, pricePKR: 1200, category: "Quran" },
-
-  { id: "s8", name: "Qaza Namaz", countLabel: "1 year", priceGBP: 45, pricePKR: 15000, category: "Qaza" },
-  { id: "s9", name: "Qaza Roza", countLabel: "1 year", priceGBP: 40, pricePKR: 13000, category: "Qaza" }
-];
+import React from "react";
 
 export default function Home() {
-  // ✅ Load cart from localStorage at start
-  const [cart, setCart] = useState<Service[]>(() => getCart());
-
-  // ✅ Listen for cart changes (clearCart from Checkout, etc.)
-  useEffect(() => {
-    const unsub = onCartChange(() => setCart(getCart()));
-    return unsub;
-  }, []);
-
-  // ✅ Group services by category
-  const grouped = useMemo(() => {
-    const map = new Map<string, Service[]>();
-    for (const s of SERVICES) {
-      map.set(s.category, [...(map.get(s.category) || []), s]);
-    }
-    return Array.from(map.entries());
-  }, []);
-
-  // ✅ Add service to cart (localStorage + UI)
-  function handleAdd(s: Service) {
-    saveToCart(s, 1);
-    setCart(getCart()); // reload from localStorage to keep consistent
-  }
-
-  // ✅ Clear cart (localStorage + UI)
-  function handleClear() {
-    clearCart();
-    setCart([]);
-  }
-
-  const totalGBP = useMemo(() => cart.reduce((sum, s) => sum + s.priceGBP, 0), [cart]);
-  const totalPKR = useMemo(() => cart.reduce((sum, s) => sum + s.pricePKR, 0), [cart]);
-
   return (
-    <div className="container">
-      <div className="hero">
-        <h1>Noor e Hadiya</h1>
-        <p className="muted">Choose a recitation/amal service for your deceased loved ones.</p>
-      </div>
+    <div className="home-page">
+      <div className="page">
+        <div className="page-inner">
+          {/* HERO */}
+          <div className="home-hero home-hero--single home-hero-bg-photo">
+            <div className="home-hero-left">
+              <div className="badge">Donation-based Qur’anic & Amal services</div>
 
-      <div className="grid-2">
-        {/* LEFT: Services */}
-        <div>
-          {grouped.map(([category, items]) => (
-            <section key={category} className="section">
-              <div className="section-head">
-                <h2>{category}</h2>
-              </div>
+              <h1 className="home-title">Noor-e-Hadiya</h1>
 
-              <div className="cards">
-                {items.map((s) => (
-                  <ServiceCard key={s.id} service={s} onAdd={handleAdd} />
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-
-        {/* RIGHT: Cart */}
-        <aside className="sidebar">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3>Your Cart</h3>
-
-            {cart.length > 0 && (
-              <button className="btn" onClick={handleClear}>
-                Clear
-              </button>
-            )}
+              <p className="home-subtitle">
+                Noor e Hadiya is a compassionate platform created to help families offer Qur’anic recitations, prayers, and other sacred acts as hadiya (spiritual gifts) for their deceased loved ones. Through this service, families can arrange Qur’an recitation, supplications, and other holy practices on behalf of those who have passed away, with the intention of seeking mercy, forgiveness, and ongoing reward for them. The fidya and ujrah associated with these services are distributed to deserving and poor families who carry out these acts of worship, helping them meet their daily needs with dignity. In this way, Noor e Hadiya connects remembrance of the deceased with charity, compassion, and sustained support for those in need, creating lasting reward (sadaqah jariyah) for both the giver and the departed.
+               The fidya for missed fasts and missed obligatory prayers is calculated according to established Shia scholarly rulings, based on a fixed amount equivalent to feeding the poor.
+              </p>
+            </div>
           </div>
 
-          {cart.length === 0 ? (
-            <p className="muted">No items yet.</p>
-          ) : (
-            <>
-              <ul className="cart-list">
-                {cart.map((c, idx) => (
-                  <li key={`${c.id}-${idx}`}>
-                    {c.name} <span className="muted">({c.countLabel})</span>
-                  </li>
-                ))}
-              </ul>
+          {/* MISSION */}
+          <div className="card section-card">
+            <h2 className="section-title">Our Mission</h2>
+            <p className="section-text">
+              Noor-e-Hadiya exists to make it easy for families to send spiritual gifts for their loved ones through
+              trusted, clear, and respectful services. We focus on simplicity, affordability, and dignity in every request.
+            </p>
+          </div>
 
-              <div className="totals">
-                <div>
-                  <strong>Total:</strong> £{totalGBP.toFixed(2)}
-                </div>
-                <div className="muted">PKR {totalPKR.toFixed(0)}</div>
-              </div>
-            </>
-          )}
+          {/* VISION */}
+          <div className="card section-card">
+            <h2 className="section-title">Our Vision</h2>
+            <p className="section-text">
+              Our vision is to build a reliable and transparent platform where families can contribute Sadaqah Jariyah and
+              Qur’anic recitations with confidence — connecting hearts through faith, dua, and ongoing reward.
+            </p>
+          </div>
 
-          <a className="btn btn-primary" href="/checkout">
-            Go to Checkout
-          </a>
-        </aside>
+          {/* HOW IT WORKS */}
+          <div className="card section-card">
+            <h2 className="section-title">How It Works</h2>
+            <ol className="section-list">
+              <li>Select services from the Services page.</li>
+              <li>Add to cart and proceed to Checkout.</li>
+              <li>Pay online (GBP) or manually (PKR).</li>
+              <li>Confirm payment via WhatsApp with your Reference ID.</li>
+            </ol>
+          </div>
+
+          {/* END PARAGRAPH */}
+          <div className="card section-card">
+            <p className="section-text" style={{ margin: 0 }}>
+              We pray Allah (SWT) accepts your intention, grants mercy to your loved ones, and makes this contribution a
+              source of continuous reward (Sadaqah Jariyah). Ameen.
+            </p>
+          </div>        
+        </div>
+        </div>
       </div>
-    </div>
   );
 }

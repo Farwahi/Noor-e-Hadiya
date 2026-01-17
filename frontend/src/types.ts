@@ -4,8 +4,21 @@ export type Service = {
   countLabel: string; // e.g. "100x", "1x", "1 year"
   priceGBP: number;
   pricePKR: number;
-  category: string; // e.g. "Tasbeeh", "Quran", "Qaza"
+  category: string; // e.g. "Tasbih & Short Duas", "Qur’an Recitation", "Qaza"
 };
+
+export type DonationItem = {
+  id: string;
+  name: string;
+  priceGBP: number;
+  pricePKR: number;
+  category: "Sadaqah";
+  isDonation: true;
+  donationGBP?: number;
+  donationPKR?: number;
+};
+
+export type CartItem = Service | DonationItem;
 
 export type PaymentDetailsResponse = {
   ok: boolean;
