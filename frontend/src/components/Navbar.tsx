@@ -14,7 +14,7 @@ export default function Navbar() {
           />
 
           <Link to="/" className="brand">
-            Noor e Hadiya
+            Noor-e-Hadiya
           </Link>
         </div>
 
