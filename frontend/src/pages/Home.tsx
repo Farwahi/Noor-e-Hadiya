@@ -43,7 +43,7 @@ export default function Home() {
             <ol className="section-list">
               <li>Select services from the Services page.</li>
               <li>Add to cart and proceed to Checkout.</li>
-              <li>Pay online (GBP) or manually (PKR).</li>
+              <li>Pay online (GBP)(USD) or manually (PKR).</li>
               <li>Confirm payment via WhatsApp with your Reference ID.</li>
             </ol>
           </div>

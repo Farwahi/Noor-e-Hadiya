@@ -1,42 +1,50 @@
+// types.ts
+
+/* =========================
+   SERVICES (Fixed-price items)
+========================= */
 export type Service = {
   id: string;
   name: string;
   countLabel: string; // e.g. "100x", "1x", "1 year"
 
-  // Existing currencies (keep required)
+  // Supported currencies
   priceGBP: number;
   pricePKR: number;
-
-  // ✅ NEW: optional USD support (won’t break anything)
-  priceUSD?: number;
+  priceUSD: number;
 
   category: string; // e.g. "Tasbih & Short Duas", "Qur’an Recitation", "Qaza"
 };
 
+/* =========================
+   DONATIONS (Custom amount)
+========================= */
 export type DonationItem = {
   id: string;
   name: string;
 
-  // Existing currencies (keep required)
+  // Base prices (used if needed)
   priceGBP: number;
   pricePKR: number;
-
-  // ✅ NEW: optional USD support
-  priceUSD?: number;
+  priceUSD: number;
 
   category: "Sadaqah";
   isDonation: true;
 
-  // Optional: store raw custom amount user entered
+  // Custom entered amounts (optional)
   donationGBP?: number;
   donationPKR?: number;
-
-  // ✅ NEW: optional USD custom amount
   donationUSD?: number;
 };
 
+/* =========================
+   CART ITEM
+========================= */
 export type CartItem = Service | DonationItem;
 
+/* =========================
+   PAYMENT DETAILS RESPONSE
+========================= */
 export type PaymentDetailsResponse = {
   ok: boolean;
   data?: {
@@ -45,22 +53,22 @@ export type PaymentDetailsResponse = {
       accountName: string;
       sortCode?: string;
       accountNumber: string; // masked from backend
-      currency: string;
+      currency: "GBP" | "USD" | string; // ✅ FIX (not only "GBP")
     };
     PK: {
       provider: string;
       accountName: string;
       accountNumber: string; // masked from backend
-      currency: string;
+      currency: "PKR" | string; // ✅ FIX
     };
 
-    // ✅ NEW (optional): US payment section if you add it later in backend
+    // Optional – keep for future if you add US details later
     US?: {
       provider: string;
       accountName: string;
       accountNumber: string; // masked from backend
-      currency: string; // "USD"
       routingNumber?: string;
+      currency: "USD" | string;
     };
   };
   error?: string;

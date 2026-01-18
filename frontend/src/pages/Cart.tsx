@@ -16,6 +16,12 @@ export default function CartPage() {
     [items]
   );
 
+  // ✅ USD (safe)
+  const totalUSD = useMemo(
+    () => items.reduce((sum, it) => sum + Number((it as any).priceUSD ?? 0), 0),
+    [items]
+  );
+
   const totalPKR = useMemo(
     () => items.reduce((sum, it) => sum + (it.pricePKR || 0), 0),
     [items]
@@ -52,14 +58,29 @@ export default function CartPage() {
               </p>
             </div>
 
-            <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: 10,
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
+            >
               {items.length > 0 && (
-                <button className="btn" onClick={clearCart} style={{ width: "auto", marginTop: 0 }}>
+                <button
+                  className="btn"
+                  onClick={clearCart}
+                  style={{ width: "auto", marginTop: 0 }}
+                >
                   Clear Cart
                 </button>
               )}
 
-              <Link to="/services" className="btn" style={{ width: "auto", marginTop: 0 }}>
+              <Link
+                to="/services"
+                className="btn"
+                style={{ width: "auto", marginTop: 0 }}
+              >
                 Add More
               </Link>
             </div>
@@ -74,7 +95,11 @@ export default function CartPage() {
                 Your cart is empty.
               </p>
 
-              <Link to="/services" className="btn btn-primary" style={{ width: "auto" }}>
+              <Link
+                to="/services"
+                className="btn btn-primary"
+                style={{ width: "auto" }}
+              >
                 Go to Services
               </Link>
             </div>
@@ -88,8 +113,8 @@ export default function CartPage() {
                   const label = isDonation
                     ? "Donation"
                     : "countLabel" in it
-                      ? it.countLabel
-                      : "";
+                    ? it.countLabel
+                    : "";
 
                   return (
                     <li key={`${it.id}-${idx}`} style={{ marginBottom: 8 }}>
@@ -118,7 +143,25 @@ export default function CartPage() {
                   <b>£{totalGBP.toFixed(2)}</b>
                 </div>
 
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+                {/* ✅ USD total block (as requested) */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginTop: 8,
+                  }}
+                >
+                  <span className="muted">Total (USD)</span>
+                  <b>${totalUSD.toFixed(2)}</b>
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginTop: 8,
+                  }}
+                >
                   <span className="muted">Total (PKR)</span>
                   <b>PKR {Math.round(totalPKR).toLocaleString()}</b>
                 </div>

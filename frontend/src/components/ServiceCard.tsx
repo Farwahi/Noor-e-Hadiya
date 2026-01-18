@@ -1,9 +1,9 @@
 import React from "react";
-import { Service } from "../types";
+import type { Service } from "../types";
 
 export default function ServiceCard({
   service,
-  onAdd
+  onAdd,
 }: {
   service: Service;
   onAdd: (s: Service) => void;
@@ -18,11 +18,16 @@ export default function ServiceCard({
 
         <div className="price">
           <div>£{service.priceGBP.toFixed(2)}</div>
-          <div className="muted">PKR {service.pricePKR.toFixed(0)}</div>
+          <div className="muted">
+            PKR {Math.round(service.pricePKR).toLocaleString()}
+          </div>
+          <div className="muted">
+            ${service.priceUSD.toFixed(2)}
+          </div>
         </div>
       </div>
 
-      <button className="btn" onClick={() => onAdd(service)}>
+      <button className="btn btn-primary" onClick={() => onAdd(service)}>
         Add
       </button>
     </div>
