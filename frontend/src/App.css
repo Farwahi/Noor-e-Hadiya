@@ -17,10 +17,37 @@
 
 *{ box-sizing:border-box; }
 
-body {
-  background-color: #eaf4ef; /* soft light green */
-  margin: 0;
+body{
+  margin:0;
+  color:var(--text);
+  font-family: system-ui, Arial, sans-serif;
+
+  /* 🌑 EXTRA-DARK PREMIUM ISLAMIC BACKGROUND */
+  background:
+    radial-gradient(
+      1100px 650px at 12% -10%,
+      rgba(15,138,95,.42),
+      transparent 60%
+    ),
+    radial-gradient(
+      1000px 650px at 88% 8%,
+      rgba(214,177,92,.28),
+      transparent 55%
+    ),
+    radial-gradient(
+      900px 600px at 30% 95%,
+      rgba(11,111,76,.36),
+      transparent 60%
+    ),
+    linear-gradient(
+      180deg,
+      #cfe5dc 0%,
+      #bcd9cc 30%,
+      #dff1ea 65%,
+      #ffffff 100%
+    );
 }
+
 
 
 a{ color:inherit; text-decoration:none; }
@@ -33,9 +60,6 @@ a{ color:inherit; text-decoration:none; }
   padding-bottom: 18px; /* extra gap from bottom */
 }
 
-/* =========================
-   NAVBAR (ONLY SIZE INCREASE)
-========================= */
 /* =========================
    NAVBAR – ELEGANT ISLAMIC
 ========================= */
@@ -135,12 +159,189 @@ a{ color:inherit; text-decoration:none; }
 }
 
 /* =========================
+   CALCULATOR UI (Noor-e-Hadiya)
+========================= */
+
+.calc-wrap{
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.calc-card{
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+.calc-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom: 12px;
+}
+
+.calc-title{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+.calc-title h3{
+  margin:0;
+  font-size: 20px;
+}
+
+.calc-title p{
+  margin:0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.calc-controls{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.calc-controls label{
+  font-size: 13px;
+  color: var(--muted);
+  display:flex;
+  gap:6px;
+  align-items:center;
+}
+
+.calc-controls select{
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #fff;
+  outline: none;
+}
+
+/* Each Section */
+.calc-section{
+  margin-top: 14px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.calc-section-head{
+  background: linear-gradient(90deg, var(--emerald), var(--emerald2));
+  color: #fff;
+  padding: 10px 12px;
+  font-weight: 700;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.calc-section-head small{
+  font-weight: 500;
+  opacity: .9;
+}
+
+.calc-section-body{
+  padding: 12px;
+}
+
+.calc-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 760px){
+  .calc-grid{ grid-template-columns: 1fr; }
+}
+
+/* Inputs */
+.calc-field label{
+  display:block;
+}
+
+.calc-field .lbl{
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.calc-field input{
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  outline: none;
+  background: #fff;
+}
+
+.calc-field input:focus{
+  border-color: rgba(15,138,95,.55);
+  box-shadow: 0 0 0 3px rgba(15,138,95,.12);
+}
+
+.calc-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-top: 10px;
+}
+
+.calc-row select{
+  padding: 9px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background:#fff;
+}
+
+/* Result Box */
+.calc-result{
+  margin-top: 12px;
+  background: var(--card);
+  border: 1px dashed rgba(15,138,95,.35);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.calc-result .big{
+  margin-top: 6px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--emerald2);
+}
+
+/* Notes / warnings */
+.calc-note{
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.calc-warn{
+  background: rgba(214,177,92,.15);
+  border: 1px solid rgba(214,177,92,.45);
+  padding: 10px;
+  border-radius: 12px;
+  color: rgba(16,24,40,.85);
+  margin-bottom: 10px;
+}
+
+/* =========================
    GLOBAL PAGE WIDTH (ALL PAGES SAME)
 ========================= */
 .page{
   width:100%;
   padding:36px 24px 56px;
   flex: 1; /* pushes footer to bottom on short pages */
+  background: transparent; /* ✅ allow global body gradient on all pages */
 }
 
 .page-inner,
@@ -202,21 +403,9 @@ a{ color:inherit; text-decoration:none; }
 }
 
 /* =========================
-   HOME PAGE BACKGROUND (SOFT, NOT WHITE)
+   HOME PAGE BACKGROUND REMOVED ✅
+   (Now body gradient applies to all pages)
 ========================= */
-.home-page{
-  min-height: calc(100vh - 70px);
-
-  /* ✅ ADD THIS */
-  /* padding-left: 44px;
-  padding-right: 44px; */
-
-  background:
-    radial-gradient(900px 520px at 18% 0%, rgba(15,138,95,.16), transparent 60%),
-    radial-gradient(850px 520px at 82% 12%, rgba(214,177,92,.12), transparent 55%),
-    radial-gradient(700px 420px at 30% 85%, rgba(15,138,95,.10), transparent 60%),
-    linear-gradient(180deg, #fbfffd 0%, #f2fbf6 45%, #ffffff 100%);
-}
 
 /* HERO */
 .home-hero{
@@ -445,6 +634,7 @@ a{ color:inherit; text-decoration:none; }
   grid-template-columns:repeat(4,1fr);
   gap:16px;
 }
+
 /* =========================
    SERVICES SECTION DIVIDER
 ========================= */
@@ -470,8 +660,10 @@ a{ color:inherit; text-decoration:none; }
   .services-actions{ justify-content:flex-start; } /* nicer on mobile */
 }
 
-
 /* Service cards */
+/* =========================
+   BASE SERVICE CARD (LIGHT)
+========================= */
 .services-light .card{
   background:#f4fff8;
   box-shadow:none;
@@ -481,12 +673,59 @@ a{ color:inherit; text-decoration:none; }
   min-height:220px;
 }
 
+/* =========================
+   NEW SERVICE CARD DESIGN
+========================= */
+.service-card{
+  background:#f8fffb;
+  border:1px solid rgba(15,138,95,.22);
+  border-radius:18px;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  min-height:200px;
+}
+
+/* =========================
+   CARD TOP LAYOUT
+========================= */
 .service-card-top{
   display:flex;
   justify-content:space-between;
   gap:12px;
 }
 
+.service-card-left{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+}
+
+/* =========================
+   ICON (NEW)
+========================= */
+.service-icon{
+  width:54px;
+  height:54px;
+  border-radius:14px;
+  background:#fff;
+  border:1px solid rgba(15,138,95,.22);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 10px 22px rgba(11,111,76,.12);
+  flex:0 0 auto;
+}
+
+.service-icon img{
+  width:34px;
+  height:34px;
+  object-fit:contain;
+}
+
+/* =========================
+   LEGACY IMAGE SUPPORT (SAFE)
+========================= */
 .service-card-img{
   width:64px;
   height:64px;
@@ -503,9 +742,21 @@ a{ color:inherit; text-decoration:none; }
   object-fit:cover;
 }
 
+/* =========================
+   TEXT & COUNT
+========================= */
 .service-count{
   font-size:13px;
   font-weight:700;
+  color:#0b6f4c;
+}
+
+/* =========================
+   PRICE STYLES
+========================= */
+.price-main{
+  font-size:18px;
+  font-weight:900;
   color:#0b6f4c;
 }
 
@@ -523,18 +774,22 @@ a{ color:inherit; text-decoration:none; }
   color:#0b6f4c;
 }
 
-/* ✅ Service card Add button (small, centered, no overlap) */
+/* =========================
+   ADD BUTTON (FINAL)
+========================= */
 .services-grid .btn,
 .services-grid .btn-primary,
-.services-grid button{
-  margin-top:auto;          /* push to bottom */
-  width:40%;
+.services-grid button,
+.service-add-btn{
+  margin-top:auto;              /* push to bottom */
+  width:45%;
   max-width:180px;
-  padding:7px 14px;
+  padding:8px 16px;
   font-size:14px;
   align-self:center;
   box-shadow:0 6px 12px rgba(11,111,76,.22);
 }
+
 
 /* =========================
    RESPONSIVE HELPERS
@@ -545,6 +800,7 @@ a{ color:inherit; text-decoration:none; }
   .container{ padding-left:16px; padding-right:16px; }
   .nav-inner{ padding-left:16px; padding-right:16px; }
 }
+
 /* =========================
    SADAQAH PAGE
 ========================= */
@@ -707,6 +963,7 @@ a{ color:inherit; text-decoration:none; }
   color: rgba(16,24,40,.60);
   font-size: 13px;
 }
+
 .sadaqah-desc{
   margin-top: 8px;
   max-width: 720px;
@@ -725,28 +982,32 @@ a{ color:inherit; text-decoration:none; }
 .checkout-page h1, .checkout-page h2, .checkout-page h3{
   color: var(--emerald2);
 }
+
 /* Force green headings ONLY inside page cards */
 .container .card > h1,
 .container .card > h2,
 .container .card > h3{
   color: var(--emerald2) !important;
 }
+
 .page-heading { color: var(--emerald2); }
+
 /* Checkout section headings ONLY */
 .checkout-wrap h3 {
   color: var(--emerald2);
 }
+
 /* Fix Checkout sidebar overlap */
 .checkout-grid{
-  align-items: flex-start;  /* keeps columns aligned nicely */
+  align-items: flex-start;
 }
 
 .sidebar{
   position: sticky;
-  top: 86px;               /* same as your inline style */
-  align-self: flex-start;  /* important */
-  height: fit-content;     /* prevents stretching */
-  margin-bottom: 24px;     /* stops overlap into footer area */
+  top: 86px;
+  align-self: flex-start;
+  height: fit-content;
+  margin-bottom: 24px;
   z-index: 2;
 }
 
@@ -754,6 +1015,7 @@ a{ color:inherit; text-decoration:none; }
 .checkout-wrap{
   padding-bottom: 60px;
 }
+
 /* =========================
    HOME PAGE – FIXED LEFT / RIGHT SPACE
 ========================= */
@@ -763,3 +1025,64 @@ a{ color:inherit; text-decoration:none; }
   padding-right: 44px !important;
 }
 
+/* PKR buttons alignment fix */
+.sadaqah-chips{
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.sadaqah-chip{
+  min-width: 64px;
+  padding: 10px 14px;
+  white-space: nowrap;
+}
+
+@media (max-width: 520px){
+  .sadaqah-chips{ flex-wrap: wrap; }
+}
+/* Divider like screenshot */
+.service-divider{
+  height:1px;
+  background: rgba(15,138,95,.18);
+  margin: 2px 0 6px;
+}
+
+/* Prices row with all currencies */
+.service-prices{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  flex-wrap:wrap; /* safe on mobile */
+}
+
+.service-price-gbp{
+  font-size:22px;
+  font-weight:900;
+  color:#0b6f4c;
+  line-height:1;
+}
+
+.service-price-muted{
+  font-size:14px;
+  font-weight:700;
+  color:rgba(16,24,40,.65);
+}
+
+.service-price-sep{
+  color:rgba(16,24,40,.40);
+  font-weight:700;
+}
+
+/* Icon larger + more visible (right side) */
+.service-icon-right{
+  width:64px;
+  height:64px;
+  border-radius:14px;
+}
+
+.service-icon-right img{
+  width:46px;
+  height:46px;
+  object-fit:contain;
+}

@@ -11,20 +11,27 @@ function notify() {
 export function getCart(): CartItem[] {
   try {
     const raw = localStorage.getItem(CART_KEY);
-    return raw ? (JSON.parse(raw) as CartItem[]) : [];
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as CartItem[]) : [];
   } catch {
     return [];
   }
 }
 
 export function setCart(items: CartItem[]) {
-  localStorage.setItem(CART_KEY, JSON.stringify(items));
+  if (!items || items.length === 0) {
+    localStorage.removeItem(CART_KEY);
+  } else {
+    localStorage.setItem(CART_KEY, JSON.stringify(items));
+  }
   notify();
 }
 
 export function addToCart(item: CartItem, qty = 1) {
   const cart = getCart();
-  for (let i = 0; i < qty; i++) cart.push(item);
+  const n = Math.max(1, Number(qty) || 1);
+  for (let i = 0; i < n; i++) cart.push(item);
   setCart(cart);
 }
 

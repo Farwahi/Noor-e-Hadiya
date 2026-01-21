@@ -51,7 +51,7 @@ export default function Checkout() {
   });
 
   // ✅ WhatsApp support number
-  const whatsappNumber = "447551214149"; // no +, no spaces
+  const whatsappNumber = "447551214149";
 
   // ✅ totals (base prices stored in cart)
   const totalGBP = useMemo(
@@ -64,26 +64,30 @@ export default function Checkout() {
     [items]
   );
 
-  // ✅ USD total: prefer stored priceUSD; fallback to GBP * rate; final fallback to GBP (never 0)
-  const totalUSD = useMemo(() => {
-    // 1) Prefer stored USD if you have it (e.g., Sadaqah now stores all currencies)
-    const stored = items.reduce((s, it) => s + Number((it as any).priceUSD || 0), 0);
-    if (stored > 0) return stored;
+  // ✅ USD stored sum (if items have priceUSD saved like Sadaqah)
+  const totalUSDStored = useMemo(() => {
+    return items.reduce((s, it) => s + Number((it as any).priceUSD || 0), 0);
+  }, [items]);
 
-    // 2) If we have rate, convert from GBP
-    if (gbpUsd && Number.isFinite(gbpUsd) && gbpUsd > 0) {
-      return items.reduce((s, it) => s + Number((it as any).priceGBP || 0) * gbpUsd, 0);
-    }
+  // ✅ USD display total (always shows something; for UI only)
+  const totalUSDDisplay = useMemo(() => {
+    if (totalUSDStored > 0) return totalUSDStored;
+    if (gbpUsd && Number.isFinite(gbpUsd) && gbpUsd > 0) return totalGBP * gbpUsd;
+    return totalGBP; // display fallback only
+  }, [totalUSDStored, gbpUsd, totalGBP]);
 
-    // 3) Final fallback: display GBP value as USD (so it never becomes 0)
-    return totalGBP;
-  }, [items, gbpUsd, totalGBP]);
+  // ✅ USD Stripe total (must be REAL — no fake fallback)
+  const totalUSDForStripe = useMemo(() => {
+    if (totalUSDStored > 0) return totalUSDStored;
+    if (gbpUsd && Number.isFinite(gbpUsd) && gbpUsd > 0) return totalGBP * gbpUsd;
+    return 0; // if no reliable USD, block Stripe USD
+  }, [totalUSDStored, gbpUsd, totalGBP]);
 
   const selectedTotalLabel =
     currency === "GBP"
       ? `£${totalGBP.toFixed(2)}`
       : currency === "USD"
-      ? `$${totalUSD.toFixed(2)}`
+      ? `$${totalUSDDisplay.toFixed(2)}`
       : `PKR ${Math.round(totalPKR).toLocaleString()}`;
 
   const description = useMemo(() => {
@@ -107,7 +111,7 @@ export default function Checkout() {
       currency === "GBP"
         ? `£${totalGBP.toFixed(2)}`
         : currency === "USD"
-        ? `$${totalUSD.toFixed(2)}`
+        ? `$${totalUSDDisplay.toFixed(2)}`
         : `PKR ${Math.round(totalPKR).toLocaleString()}`;
 
     const lines = [
@@ -132,7 +136,7 @@ export default function Checkout() {
   }, [
     currency,
     totalGBP,
-    totalUSD,
+    totalUSDDisplay,
     totalPKR,
     referenceId,
     description,
@@ -174,7 +178,7 @@ export default function Checkout() {
       .finally(() => setLoading(false));
   }, []);
 
-  // ✅ Live rate fetch only when USD selected (30 min cache) — FIXED ENDPOINT + CACHE FALLBACK
+  // ✅ Live rate fetch only when USD selected (30 min cache) — robust + cached fallback
   useEffect(() => {
     async function loadRateIfNeeded() {
       if (currency !== "USD") return;
@@ -182,7 +186,6 @@ export default function Checkout() {
       try {
         setRateError(null);
 
-        // 30 min cache (session)
         const cacheRaw = localStorage.getItem("neh_fx_cache_gbp_usd");
         if (cacheRaw) {
           const cache = JSON.parse(cacheRaw) as { ts: number; rate: number };
@@ -194,8 +197,6 @@ export default function Checkout() {
 
         setRateLoading(true);
 
-        // ✅ WORKING FREE SOURCE (no key): open.er-api.com
-        // 1 GBP = ? USD
         const r = await fetch("https://open.er-api.com/v6/latest/GBP");
         const j = await r.json();
         const rate = Number(j?.rates?.USD);
@@ -206,7 +207,6 @@ export default function Checkout() {
         localStorage.setItem("neh_gbp_usd", String(rate));
         localStorage.setItem("neh_fx_cache_gbp_usd", JSON.stringify({ ts: Date.now(), rate }));
       } catch (e: any) {
-        // ✅ fallback to stored neh_gbp_usd if available
         const cached = Number(localStorage.getItem("neh_gbp_usd") || 0);
         if (cached && Number.isFinite(cached) && cached > 0) {
           setGbpUsd(cached);
@@ -227,10 +227,11 @@ export default function Checkout() {
     const isOnline = currency === "GBP" || currency === "USD";
     if (!isOnline) return;
 
-    const amount = currency === "GBP" ? totalGBP : totalUSD;
+    const stripeCurrency = currency === "GBP" ? "gbp" : "usd";
+    const amount = currency === "GBP" ? totalGBP : totalUSDForStripe;
 
     if (currency === "USD" && amount <= 0) {
-      alert("USD amount is 0. Please try again or switch to GBP.");
+      alert("USD rate is not ready. Please wait a moment or use GBP.");
       return;
     }
     if (amount <= 0) return;
@@ -248,10 +249,9 @@ export default function Checkout() {
         .join(" | ");
 
       const fullDesc = extra ? `${description} | ${extra}` : description;
-      const stripeCurrency = currency === "GBP" ? "gbp" : "usd";
 
       const res = await createCheckoutSession({
-        amount, // keep same as your current backend expectation
+        amount,
         currency: stripeCurrency,
         description: fullDesc,
       });
@@ -269,12 +269,10 @@ export default function Checkout() {
   // ✅ PKR confirm: open WhatsApp with all details (Option B)
   function confirmManualPakistan() {
     if (totalPKR <= 0) return;
-
     if (!manualTxnId.trim()) {
       alert("Please enter Transaction ID to confirm on WhatsApp.");
       return;
     }
-
     window.open(whatsappLink, "_blank");
   }
 
@@ -295,7 +293,6 @@ export default function Checkout() {
   const pkBank = (data as any)?.PK?.bank;
 
   const pkSelected = (() => {
-    // If backend not updated, keep showing old PK fields
     if (!pkEasy && !pkJazz && !pkUP && !pkBank) {
       return { accountName: pkOldName, accountNumber: pkOldNumber, note: "" };
     }
@@ -326,7 +323,7 @@ export default function Checkout() {
         : "Live rate not loaded"
       : "";
 
-  const usdReady = currency !== "USD" || totalUSD > 0;
+  const usdReady = currency !== "USD" || totalUSDForStripe > 0;
 
   return (
     <div className="page">
@@ -411,13 +408,15 @@ export default function Checkout() {
                   <ul style={{ marginTop: 10 }}>
                     {items.map((it, idx) => {
                       const label =
-                        ("countLabel" in (it as any) && (it as any).countLabel) ? (it as any).countLabel : "Donation";
+                        ("countLabel" in (it as any) && (it as any).countLabel)
+                          ? (it as any).countLabel
+                          : "Donation";
 
                       const pGBP = Number((it as any).priceGBP || 0);
                       const pPKR = Number((it as any).pricePKR || 0);
-
-                      // ✅ USD line price: prefer stored USD else convert from GBP using gbpUsd else fallback to GBP
                       const storedUSD = Number((it as any).priceUSD || 0);
+
+                      // ✅ USD line price: prefer stored USD else convert from GBP using rate else fallback GBP for display
                       const pUSD =
                         storedUSD > 0 ? storedUSD : gbpUsd && gbpUsd > 0 ? pGBP * gbpUsd : pGBP;
 
@@ -500,18 +499,27 @@ export default function Checkout() {
                 <button
                   className="btn btn-primary"
                   onClick={payNowStripe}
-                  disabled={paying || (currency === "GBP" ? totalGBP <= 0 : totalUSD <= 0) || (currency === "USD" && !usdReady)}
+                  disabled={
+                    paying ||
+                    (currency === "GBP" ? totalGBP <= 0 : totalUSDForStripe <= 0) ||
+                    (currency === "USD" && !usdReady)
+                  }
                 >
                   {paying
                     ? "Redirecting..."
                     : currency === "GBP"
                     ? `Pay £${totalGBP.toFixed(2)} with Stripe`
-                    : `Pay $${totalUSD.toFixed(2)} with Stripe`}
+                    : `Pay $${totalUSDDisplay.toFixed(2)} with Stripe`}
                 </button>
 
                 {currency === "USD" && (
                   <div className="muted" style={{ marginTop: 10, fontSize: 13, lineHeight: 1.4 }}>
                     {usdInfoText}
+                    {!usdReady ? (
+                      <div style={{ marginTop: 6 }}>
+                        USD payment needs live rate (or stored USD prices). Please wait or use GBP.
+                      </div>
+                    ) : null}
                   </div>
                 )}
 

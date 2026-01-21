@@ -12,6 +12,9 @@ import Sadaqah from "./pages/Sadaqah";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 
+// ✅ NEW
+import Calculators from "./pages/Calculators";
+
 export default function App() {
   return (
     <div className="app">
@@ -23,11 +26,14 @@ export default function App() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/sadaqah" element={<Sadaqah />} />
+
+        {/* ✅ NEW ROUTE */}
+        <Route path="/calculators" element={<Calculators />} />
+
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
       </Routes>
 
-      {/* Footer appears on EVERY page */}
       <Footer />
     </div>
   );

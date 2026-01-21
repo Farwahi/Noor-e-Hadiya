@@ -23,6 +23,10 @@ export default function Navbar() {
           <NavLink to="/" end>Home</NavLink>
           <NavLink to="/services">Services</NavLink>
           <NavLink to="/sadaqah">Sadaqah</NavLink>
+
+          {/* ✅ NEW: Calculators */}
+          <NavLink to="/calculators">Calculators</NavLink>
+
           <NavLink to="/about">About</NavLink>
           <NavLink to="/contact">Contact</NavLink>
           <NavLink to="/cart">Cart</NavLink>

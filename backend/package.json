@@ -1,6 +1,6 @@
 {
   "name": "noor-e-hadiya-backend",
-   "type": "module",
+  "type": "module",
   "version": "1.0.0",
   "private": true,
   "main": "server.js",
@@ -12,6 +12,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.19.2",
+    "node-fetch": "^3.3.2",
     "stripe": "^20.1.2"
   },
   "devDependencies": {

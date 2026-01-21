@@ -1,7 +1,55 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import type { CartItem } from "../types";
+import type { CartItem, DonationItem } from "../types";
 import { clearCart, getCart, onCartChange } from "../cart";
+
+function isDonationItem(it: CartItem): it is DonationItem {
+  return (it as any).isDonation === true;
+}
+
+// ✅ Universal getters so totals never become 0 by mistake
+// Works with:
+// - Services: priceGBP / priceUSD / pricePKR
+// - Donations: donationGBP / donationUSD / donationPKR
+// - Zakat items (your calculator): priceGBP / priceUSD / pricePKR (+ price/pkr fallback)
+function getGBP(it: CartItem): number {
+  const anyIt: any = it;
+  if (isDonationItem(it)) {
+    return Number(anyIt.donationGBP ?? anyIt.priceGBP ?? anyIt.price ?? 0) || 0;
+  }
+  return Number(anyIt.priceGBP ?? anyIt.price ?? 0) || 0;
+}
+
+function getUSD(it: CartItem): number {
+  const anyIt: any = it;
+  if (isDonationItem(it)) {
+    return Number(anyIt.donationUSD ?? anyIt.priceUSD ?? anyIt.price ?? 0) || 0;
+  }
+  return Number(anyIt.priceUSD ?? anyIt.price ?? 0) || 0;
+}
+
+function getPKR(it: CartItem): number {
+  const anyIt: any = it;
+  if (isDonationItem(it)) {
+    return (
+      Number(anyIt.donationPKR ?? anyIt.pricePKR ?? anyIt.pkr ?? anyIt.price ?? 0) || 0
+    );
+  }
+  return Number(anyIt.pricePKR ?? anyIt.pkr ?? anyIt.price ?? 0) || 0;
+}
+
+function moneyLabel(it: CartItem) {
+  if (!isDonationItem(it)) return null;
+
+  const gbp = getGBP(it);
+  const usd = getUSD(it);
+  const pkr = getPKR(it);
+
+  if (gbp > 0) return `£${gbp.toFixed(2)}`;
+  if (usd > 0) return `$${usd.toFixed(2)}`;
+  if (pkr > 0) return `PKR ${Math.round(pkr).toLocaleString()}`;
+  return null;
+}
 
 export default function CartPage() {
   const [items, setItems] = useState<CartItem[]>(() => getCart());
@@ -12,18 +60,15 @@ export default function CartPage() {
   }, []);
 
   const totalGBP = useMemo(
-    () => items.reduce((sum, it) => sum + (it.priceGBP || 0), 0),
+    () => items.reduce((sum, it) => sum + getGBP(it), 0),
     [items]
   );
-
-  // ✅ USD (safe)
   const totalUSD = useMemo(
-    () => items.reduce((sum, it) => sum + Number((it as any).priceUSD ?? 0), 0),
+    () => items.reduce((sum, it) => sum + getUSD(it), 0),
     [items]
   );
-
   const totalPKR = useMemo(
-    () => items.reduce((sum, it) => sum + (it.pricePKR || 0), 0),
+    () => items.reduce((sum, it) => sum + getPKR(it), 0),
     [items]
   );
 
@@ -108,22 +153,47 @@ export default function CartPage() {
               {/* Items */}
               <ul style={{ margin: 0, paddingLeft: 18 }}>
                 {items.map((it, idx) => {
-                  const isDonation = "isDonation" in it && it.isDonation;
+                  const isDonation = isDonationItem(it);
 
                   const label = isDonation
-                    ? "Donation"
-                    : "countLabel" in it
-                    ? it.countLabel
+                    ? "Custom Request"
+                    : (it as any).countLabel
+                    ? (it as any).countLabel
                     : "";
 
+                  const amountText = isDonation ? moneyLabel(it) : null;
+
                   return (
-                    <li key={`${it.id}-${idx}`} style={{ marginBottom: 8 }}>
-                      <span style={{ fontWeight: 700 }}>{it.name}</span>{" "}
-                      {label ? <span className="muted">({label})</span> : null}
+                    <li key={`${it.id}-${idx}`} style={{ marginBottom: 12 }}>
+                      <div>
+                        <span style={{ fontWeight: 700 }}>{it.name}</span>{" "}
+                        {label ? (
+                          <span className="muted">({label})</span>
+                        ) : null}
+
+                        {isDonation ? (
+                          <span className="muted" style={{ marginLeft: 8 }}>
+                            • Additional
+                          </span>
+                        ) : null}
+
+                        {amountText ? (
+                          <span className="muted" style={{ marginLeft: 8 }}>
+                            • {amountText}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      {/* Extra info for donation items */}
                       {isDonation ? (
-                        <span className="muted" style={{ marginLeft: 8 }}>
-                          • Sadaqah
-                        </span>
+                        <div className="muted" style={{ marginTop: 4 }}>
+                          {(it as DonationItem).location ? (
+                            <div>Location: {(it as DonationItem).location}</div>
+                          ) : null}
+                          {(it as DonationItem).notes ? (
+                            <div>Notes: {(it as DonationItem).notes}</div>
+                          ) : null}
+                        </div>
                       ) : null}
                     </li>
                   );
@@ -138,12 +208,13 @@ export default function CartPage() {
                   paddingTop: 14,
                 }}
               >
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
                   <span className="muted">Total (GBP)</span>
                   <b>£{totalGBP.toFixed(2)}</b>
                 </div>
 
-                {/* ✅ USD total block (as requested) */}
                 <div
                   style={{
                     display: "flex",

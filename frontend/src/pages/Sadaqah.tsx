@@ -240,21 +240,21 @@ export default function Sadaqah() {
                 <div className="sadaqah-col-title">Pakistani Rupee (PKR)</div>
                 <div className="sadaqah-chips">
                   <button
-                    className={`sadaqah-chip wide ${currency === "PKR" && amountPKR === 200 ? "active" : ""}`}
+                    className={`sadaqah-chip ${currency === "PKR" && amountPKR === 200 ? "active" : ""}`}
                     onClick={() => choosePKR(200)}
                     type="button"
                   >
                     PKR 200
                   </button>
                   <button
-                    className={`sadaqah-chip wide ${currency === "PKR" && amountPKR === 300 ? "active" : ""}`}
+                    className={`sadaqah-chip ${currency === "PKR" && amountPKR === 300 ? "active" : ""}`}
                     onClick={() => choosePKR(300)}
                     type="button"
                   >
                     PKR 300
                   </button>
                   <button
-                    className={`sadaqah-chip wide ${currency === "PKR" && amountPKR === 500 ? "active" : ""}`}
+                    className={`sadaqah-chip ${currency === "PKR" && amountPKR === 500 ? "active" : ""}`}
                     onClick={() => choosePKR(500)}
                     type="button"
                   >
